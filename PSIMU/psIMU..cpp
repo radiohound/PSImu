@@ -1,5 +1,5 @@
 #include "psIMU.h"
-#include "i2c_t3.h"  
+#include <Wire.h>  
 #include <SPI.h>
 #include <Arduino.h>
 #include <Filter.h>
@@ -30,6 +30,8 @@ psIMU::psIMU(){
 	// run builtin calibration
 	cal_file = 0;
 	type = 0;
+	Wire.begin();
+	Wire.setClock(400000);
 }
 
 void psIMU::setFileCal(){
@@ -84,11 +86,11 @@ void psIMU::initPS(){
     initFXOS8700CQ();            // Initialize the accelerometer and magnetometer if communication is OK
     //accelMotionIntFXOS8700CQ();  // Configure motion interrupts
     //sleepModeFXOS8700CQ();       // Configure sleep mode
-    //Serial.println("FXOS8700CQQ is online...");
+    Serial.println("FXOS8700CQQ is online...");
     delay (1000);
 
     initFXAS21000();  // init the accelerometer if communication is OK
-    //Serial.println("FXAS21000Q is online...");
+    Serial.println("FXAS21000Q is online...");
     delay (1000);
 
     #ifdef MPL3115
@@ -96,7 +98,6 @@ void psIMU::initPS(){
 		initRealTimeMPL3115A2();         // initialize the altimeter for realtime data acquisition if communication is OK
 		MPL3115A2SampleRate(SAMPLERATE); // Set oversampling ratio
 		MPL3115A2enableEventflags();     // Set data ready enable
-		//Serial.println("MPL3115A2 event flags enabled...");
 		delay (1000);
 	#endif
 	
@@ -125,7 +126,7 @@ void psIMU::initPS(){
 		//Serial.print("GzBias = "); Serial.print(gBias[2], 2); Serial.println(" o/s");
 		delay(1000);
 	}
-    //Serial.print("Oversampling Ratio is "); Serial.println(1<<SAMPLERATE);  
+    Serial.print("Oversampling Ratio is "); Serial.println(1<<SAMPLERATE);  
 }
 
 void psIMU::getRawValues(int16_t * raw_values){
@@ -205,8 +206,8 @@ void psIMU::getValues(float * values)
   //Serial.print(accelCount[2]); Serial.print(", ");Serial.println(accelCount[2]); 
   //Serial.print("Gyro-cnt:"); Serial.print(gyroCount[0]); Serial.print(", ");
   //Serial.print(gyroCount[2]); Serial.print(", ");Serial.println(gyroCount[2]);
-  //Serial.print("Mag-cnt:"); Serial.print(magCount[0]); Serial.print(", ");
-  //Serial.print(magCount[2]); Serial.print(", ");Serial.println(magCount[2]);   
+  //Serial.print("Mag-cnt:"); Serial.print(values[6]); Serial.print(", ");
+  //Serial.print(values[7]); Serial.print(", ");Serial.println(values[8]);   
   //Serial.println();
 }
 
@@ -1182,7 +1183,9 @@ uint8_t psIMU::readByte(uint8_t address, uint8_t subAddress)
   uint8_t data; // `data` will store the register data   
   Wire.beginTransmission(address);         // Initialize the Tx buffer
   Wire.write(subAddress);                  // Put slave register address in Tx buffer
-  Wire.endTransmission(I2C_NOSTOP);        // Send the Tx buffer, but send a restart to keep connection alive
+  Wire.endTransmission(false);       // Send the Tx buffer, but send a restart to keep connection alive
+  delayMicroseconds(250);
+  //Wire.endTransmission(I2C_NOSTOP);        // Send the Tx buffer, but send a restart to keep connection alive
   Wire.requestFrom(address, (size_t) 1);   // Read one byte from slave register address 
   data = Wire.read();                      // Fill Rx buffer with result
   return data;                             // Return data read from slave register
@@ -1192,8 +1195,9 @@ void psIMU::readBytes(uint8_t address, uint8_t subAddress, uint8_t count, uint8_
 {  
   Wire.beginTransmission(address);   // Initialize the Tx buffer
   Wire.write(subAddress);            // Put slave register address in Tx buffer
-//  Wire.endTransmission(false);       // Send the Tx buffer, but send a restart to keep connection alive
-  Wire.endTransmission(I2C_NOSTOP);             // Send the Tx buffer, but send a restart to keep connection alive  uint8_t i = 0;
+  Wire.endTransmission(false);       // Send the Tx buffer, but send a restart to keep connection alive
+  delayMicroseconds(250);
+  //Wire.endTransmission(I2C_NOSTOP);             // Send the Tx buffer, but send a restart to keep connection alive  uint8_t i = 0;
         uint8_t i = 0;
         Wire.requestFrom(address, (size_t) count);  // Read bytes from slave register address 
   while (Wire.available()) {

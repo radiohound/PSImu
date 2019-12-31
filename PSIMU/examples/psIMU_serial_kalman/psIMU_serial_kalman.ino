@@ -2,8 +2,7 @@
  * FreeIMU library serial communication protocol
 */
 
-#include "i2c_t3.h"  
-#include <SPI.h>
+#include <Wire.h>
 #include <psIMU.h>
 #include "CommunicationUtils.h"
 #include <NXPSensorFusion.h>
@@ -59,7 +58,9 @@ void setup() {
   delay(5000);
   
    // Setup for Master mode, pins 16/17, external pullups, 400kHz for Teensy 3.1
-  Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400);
+  //Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, I2C_RATE_400);
+  Wire.begin();
+  Wire.setClock(400000);
   delay(1000);
  
   // Set up the interrupt pins, they're set as active high, push-pull
@@ -67,7 +68,7 @@ void setup() {
   digitalWrite(ledPin, LOW);
 
   //Set calibration source, 0 = builtin, 1 = file
-  myIMU.setFileCal();
+  myIMU.setCal(0);
 
   //Optional set gyro and accel configuration
   myIMU.setAccelFSR(AFS_2g);
@@ -220,7 +221,7 @@ void loop() {
     sumCount++;
   
     // Update the Kalman filter
-    filter.update(gx, -gy, -gz, -ax, ay, az, mx, -my, -mz);
+    filter.update(gx, gy, gz, ax, ay, az, mx, my, mz);
     
    uint32_t delt_t = millis() - count;
    if (delt_t > 100) { // update LCD once per half-second independent of read rate

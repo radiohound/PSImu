@@ -7,16 +7,16 @@
 
 #define CALIBRATION_H
 
-accel_bias[0] = -211;
-accel_bias[1] = -37;
-accel_bias[2] = -2;
-accel_scale[0] = 3798.405401;
-accel_scale[1] = 4355.937539;
-accel_scale[2] = 4165.295610;
+accel_bias[0] = -15;
+accel_bias[1] = -116;
+accel_bias[2] = 101;
+accel_scale[0] = 3989.403745;
+accel_scale[1] = 4245.394956;
+accel_scale[2] = 4070.601237;
 
-mag_bias[0] = 249;
-mag_bias[1] = 22;
-mag_bias[2] = 132;
-mag_scale[0] = 459.630087;
-mag_scale[0] = 475.958118;
-mag_scale[0] = 461.666950;
+mag_bias[0] = -19;
+mag_bias[1] = -135;
+mag_bias[2] = 525;
+mag_scale[0] = 402.173311;
+mag_scale[1] = 412.483569;
+mag_scale[2] = 399.651540;
