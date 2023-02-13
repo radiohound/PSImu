@@ -1183,9 +1183,7 @@ uint8_t psIMU::readByte(uint8_t address, uint8_t subAddress)
   uint8_t data; // `data` will store the register data   
   Wire.beginTransmission(address);         // Initialize the Tx buffer
   Wire.write(subAddress);                  // Put slave register address in Tx buffer
-  Wire.endTransmission(false);       // Send the Tx buffer, but send a restart to keep connection alive
-  delayMicroseconds(250);
-  //Wire.endTransmission(I2C_NOSTOP);        // Send the Tx buffer, but send a restart to keep connection alive
+  if (Wire.endTransmission(false) != 0) return false;
   Wire.requestFrom(address, (size_t) 1);   // Read one byte from slave register address 
   data = Wire.read();                      // Fill Rx buffer with result
   return data;                             // Return data read from slave register
@@ -1195,9 +1193,7 @@ void psIMU::readBytes(uint8_t address, uint8_t subAddress, uint8_t count, uint8_
 {  
   Wire.beginTransmission(address);   // Initialize the Tx buffer
   Wire.write(subAddress);            // Put slave register address in Tx buffer
-  Wire.endTransmission(false);       // Send the Tx buffer, but send a restart to keep connection alive
-  delayMicroseconds(250);
-  //Wire.endTransmission(I2C_NOSTOP);             // Send the Tx buffer, but send a restart to keep connection alive  uint8_t i = 0;
+  if (Wire.available() != num) return false;
         uint8_t i = 0;
         Wire.requestFrom(address, (size_t) count);  // Read bytes from slave register address 
   while (Wire.available()) {
